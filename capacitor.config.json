@@ -1,0 +1,12 @@
+{
+  "appId": "com.shivakumar.freepath",
+  "appName": "Free Path",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "loggingBehavior": "none",
+  "android": { "webContentsDebuggingEnabled": false, "allowMixedContent": false },
+  "plugins": {
+    "FirebaseAuthentication": { "skipNativeAuth": true, "providers": ["phone"] },
+    "LocalNotifications": { "smallIcon": "ic_stat_icon", "iconColor": "#1E88E5" }
+  }
+}
