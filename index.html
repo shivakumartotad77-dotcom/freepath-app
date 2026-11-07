@@ -134,6 +134,33 @@ button.chip{border:0;font-family:inherit;cursor:pointer;color:#4c5878}
 .lbr .pt{font-weight:800;color:#8a5a00;white-space:nowrap}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<script>
+/* TEMP DEBUG overlay: shows errors on screen */
+(function(){var d=document.createElement('div');d.id='dbg';d.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99999;background:rgba(0,0,0,.88);color:#7CFC00;font:11px/1.35 monospace;padding:6px;max-height:42vh;overflow:auto;pointer-events:none;white-space:pre-wrap;word-break:break-all';
+function add(t){d.textContent+=t+'\n'}
+function mount(){if(!d.parentNode)(document.body||document.documentElement).appendChild(d)}
+window.addEventListener('error',function(e){mount();add('ERR: '+e.message+' @'+(e.lineno||'')+':'+(e.colno||''))});
+window.addEventListener('unhandledrejection',function(e){mount();add('REJ: '+(e.reason&&e.reason.message||e.reason))});
+var ce=console.error;console.error=function(){try{mount();add('CE: '+[].slice.call(arguments).map(function(a){return a&&a.stack?a.stack.split('\n').slice(0,3).join(' | '):String(a)}).join(' '))}catch(x){}ce.apply(console,arguments)};
+window.addEventListener('load',function(){setTimeout(function(){mount();var w=document.getElementById('wrap'),b=document.getElementById('board');
+add('UA: '+navigator.userAgent.replace(/.*(Chrome\/[0-9.]+).*/,'$1'));
+add('aspect-ratio supported: '+(window.CSS&&CSS.supports&&CSS.supports('aspect-ratio','1')));
+add('wrap h='+(w&&w.clientHeight)+' w='+(w&&w.clientWidth)+' | board children='+(b&&b.children.length)+' h='+(b&&b.clientHeight));
+},4000)});
+})();
+</script>
+<script>
+/* TEMP DEBUG: shows errors and board size on screen */
+(function(){var box=document.createElement('div');box.style.cssText='position:fixed;left:0;right:0;bottom:0;max-height:40%;overflow:auto;background:#000c;color:#fff;font:11px monospace;padding:6px;z-index:99999;white-space:pre-wrap';
+function add(t){box.textContent+=t+'\n'}
+window.addEventListener('error',function(e){add('ERR: '+e.message+' @'+(e.lineno||''))});
+window.addEventListener('unhandledrejection',function(e){add('REJ: '+(e.reason&&e.reason.message||e.reason))});
+document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(box)});
+setTimeout(function(){try{var w=document.getElementById('wrap'),b=document.getElementById('board');
+add('UA: '+navigator.userAgent.replace(/.*Chrome\//,'Chrome/').slice(0,40));
+add('aspect-ratio: '+(CSS.supports&&CSS.supports('aspect-ratio','1')));
+add('wrap: '+w.clientWidth+'x'+w.clientHeight+'  board: '+b.clientWidth+'x'+b.clientHeight+'  kids: '+b.children.length)}catch(e){add('diag fail '+e.message)}},3000);})();
+</script>
 </head>
 <body>
 <main class="app">
@@ -1232,5 +1259,13 @@ fresh(true);checkBadges();if(PROF.phone)setTimeout(autoDaily,700);
 </script>
 <script type="module" src="firebase-bridge.js"></script>
 <script src="iap-bridge.js"></script>
+<script>
+/* Fallback for old Android WebView without CSS aspect-ratio: keep the board square */
+(function(){try{if(window.CSS&&CSS.supports&&CSS.supports('aspect-ratio','1'))return}catch(e){}
+var w=document.getElementById('wrap'),b=document.getElementById('board');if(!w||!b)return;
+b.style.height='auto';
+function fit(){w.style.height=w.clientWidth+'px'}
+fit();window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);setTimeout(fit,300);setTimeout(fit,1200);})();
+</script>
 </body>
 </html>
