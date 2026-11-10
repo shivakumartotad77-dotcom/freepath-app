@@ -1,3 +1,4 @@
+
 name: Build Play Store AAB
 on:
   workflow_dispatch:
@@ -58,7 +59,11 @@ jobs:
           KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
           KS_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          echo "$KS_B64" | base64 -d > upload.jks
+          KS_PASS=$(printf '%s' "$KS_PASS" | tr -d ' \r\n')
+          KS_ALIAS=$(printf '%s' "$KS_ALIAS" | tr -d ' \r\n')
+          printf '%s' "$KS_B64" | tr -d ' \r\n' | base64 -d > upload.jks
+          echo "password length: ${#KS_PASS} (expected 20)"
+          echo "keystore bytes: $(wc -c < upload.jks) (expected 2636)"
           cp android/app/build/outputs/bundle/release/app-release.aab FreePath-release.aab
           jarsigner -sigalg SHA256withRSA -digestalg SHA-256 -keystore upload.jks -storepass "$KS_PASS" FreePath-release.aab "$KS_ALIAS"
           jarsigner -verify FreePath-release.aab | head -3
